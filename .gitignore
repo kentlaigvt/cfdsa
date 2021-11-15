@@ -1,0 +1,6 @@
+crash.log
+.DS_Store
+node_modules/
+package-lock.json
+myapp-1.0.0.tgz
+myapp.zip
