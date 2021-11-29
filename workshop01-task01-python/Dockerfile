@@ -10,6 +10,8 @@ COPY utils.py /app/utils.py
 COPY run.sh /app/run.sh
 
 ENV PORT=3000
+ENV INSTANCE_NAME=""
+ENV INSTANCE_HASH=""
 EXPOSE $PORT
 
 WORKDIR /app
