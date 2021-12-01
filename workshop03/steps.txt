@@ -1,0 +1,31 @@
+# Setup namespace
+kubectl apply -f namespace.yaml
+
+# Deploy ingress controller
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install ingress-nginx ingress-nginx/ingress-nginx -n workshop03-ns
+
+# Deploy metrics server
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+helm repo update
+helm install metrics-server metrics-server/metrics-server -f metrics-server-values.yaml -n kube-system
+
+# Setup deployment
+kubectl apply -nworkshop03-ns -f bggdb.yaml
+kubectl apply -nworkshop03-ns -f bgg-secret.yaml
+kubectl apply -nworkshop03-ns -f bgg-config.yaml
+kubectl apply -nworkshop03-ns -f bggapp-v1.yaml
+kubectl apply -nworkshop03-ns -f bggapp-v2.yaml
+kubectl apply -nworkshop03-ns -f default-backend.yaml
+kubectl apply -nworkshop03-ns -f ingress.yaml
+
+# Check state
+kubectl get all,ing,cm,secret -nworkshop03-ns -o wide
+kubectl get all -nkube-system -o wide
+kubectl top pod -nworkshop03-ns
+
+# Check page
+curl http://bgg-188.166.207.66.nip.io/v1/
+curl http://bgg-188.166.207.66.nip.io/v2/
+
