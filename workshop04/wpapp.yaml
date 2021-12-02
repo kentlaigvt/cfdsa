@@ -1,0 +1,67 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wpapp-pvc
+  labels:
+    name: wpapp-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: do-block-storage 
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wpapp-deploy
+  labels:
+    name: wpapp-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      name: wpapp-pod
+  template:
+    metadata: 
+      name: wpapp-pod
+      labels:
+        name: wpapp-pod
+    spec:
+      volumes:
+      - name: wpapp-vol
+        persistentVolumeClaim:
+          claimName: wpapp-pvc
+      containers:
+      - name: wpapp-container
+        image: wordpress:5.8.2
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: wpapp-port
+          containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: wp-config
+        - secretRef:
+            name: wp-secret
+        volumeMounts:
+        - name: wpapp-vol
+          mountPath: /var/www/html
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wpapp-svc
+  labels:
+    name: wpapp-svc
+spec:
+  type: ClusterIP
+  selector:
+    name: wpapp-pod
+  ports:
+  - port: 80
+    targetPort: wpapp-port

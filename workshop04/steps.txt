@@ -1,0 +1,40 @@
+# Setup namespace
+kubectl apply -f namespace.yaml
+
+# Deploy ingress controller
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install ingress-nginx ingress-nginx/ingress-nginx -n workshop04-ns
+
+
+# Deploy mysql cluster
+helm repo add bitpoke https://helm-charts.bitpoke.io
+helm repo update
+helm install mysql-operator bitpoke/mysql-operator -n mysql-operator --create-namespace
+
+# Setup deployment
+kubectl apply -nworkshop04-ns -f wp-secret.yaml
+kubectl apply -nworkshop04-ns -f wp-config.yaml
+kubectl apply -nworkshop04-ns -f wpdb.yaml
+kubectl apply -nworkshop04-ns -f wpapp.yaml
+kubectl apply -nworkshop04-ns -f ingress.yaml
+
+# Check state
+kubectl get all,ing,cm,secret,mysql,mysqldatabases -nworkshop04-ns -o wide
+kubectl get all -nworkshop04-ns -o wide
+
+# Check page
+curl -v http://acme-137.184.250.174.nip.io/
+
+
+
+kubectl port-forward service/wpapp-svc -nworkshop04-ns 3000:3000
+kubectl logs  -nworkshop04-ns pod/wpapp-deploy-66c64ff4cd-nvp5w
+
+
+
+
+kubectl delete -nworkshop04-ns service/wpapp-svc
+kubectl delete -nworkshop04-ns deployment.apps/wpapp-deploy
+kubectl delete -nworkshop04-ns mysqlcluster.mysql.presslabs.org/wpdb-cluster
+kubectl delete -nworkshop04-ns mysqldatabase.mysql.presslabs.org/wpdb-db

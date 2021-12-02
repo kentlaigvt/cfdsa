@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: workshop04-ns
+  labels:
+    name: workshop04-ns
+    

@@ -1,0 +1,20 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    name: wp-ing
+  name: wp-ing
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: acme-137.184.250.174.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wpapp-svc
+            port: 
+              number: 80
